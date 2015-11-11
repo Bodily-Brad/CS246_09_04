@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Created by bradb on 11/11/2015.
+ * Handles accessing the "counter" database which stores our count value
  */
 public class CountOpenHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
@@ -37,18 +38,43 @@ public class CountOpenHelper extends SQLiteOpenHelper {
         // Only one DB version at this point, so no upgrade handling necessary
     }
 
+    /**
+     * Gets the name of the Count Database
+     * @return
+     */
+    public String getDBName() {
+        return COUNT_DB_NAME;
+    }
+
+    /**
+     * Gets the name of the Count Table (within the Count Database)
+     * @return
+     */
     public String getTableName() {
         return COUNT_TABLE_NAME;
     }
 
+    /**
+     * Gets the key for the count value (i.e. the string stored in the 'key' column that corresponds
+     * to the row that stores the count value).
+     * @return the name of the count's key/ID
+     */
     public String getCountKey() {
         return KEY_COUNT;
     }
 
+    /**
+     * Gets the name of the key column (i.e. the column where keys are stored)
+     * @return the name of the key column
+     */
     public String getKeyColumnName() {
         return DATABASE_KEY;
     }
 
+    /**
+     * Gets the name of the value column (i.e. the column where the values are stored)
+     * @return the name of the value column
+     */
     public String getValueColumnName() {
         return DATABASE_VALUE;
     }
