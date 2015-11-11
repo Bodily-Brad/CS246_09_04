@@ -9,24 +9,41 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:id="@+id/textCount"
-        android:text="Will be count"
-        android:layout_height="wrap_content" />
     <Button
+        android:id="@+id/buttonAdvance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textCount"
-        android:id="@+id/buttonAdvance"
         android:text="@string/button_label_advance"
         android:clickable="true"
         android:onClick="AdvanceCount"/>
     <Button
+        android:id="@+id/buttonSaveCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/buttonAdvance"
-        android:id="@+id/buttonSaveCount"
+        android:layout_toRightOf="@id/buttonAdvance"
         android:onClick="SaveCount"
         android:text="@string/button_label_save_count"/>
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/buttonAdvance"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <TextView
+            android:id="@+id/labelCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_count"
+            android:textSize="30sp" />
+        <TextView
+            android:id="@+id/textCount"
+            android:layout_width="wrap_content"
+            android:text="-"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/labelCount"
+            android:paddingLeft="15dp"
+            android:textSize="30sp" />
+    </RelativeLayout>
 </RelativeLayout>
