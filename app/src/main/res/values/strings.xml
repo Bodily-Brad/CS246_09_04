@@ -3,4 +3,6 @@
     <string name="action_settings">Settings</string>
     <string name="button_label_advance">Advance</string>
     <string name="button_label_save_count">Save Count</string>
+    <string name="feedback_pref_save_successful">Count Saved to SharedPreferences</string>
+    <string name="pref_key_count">count</string>
 </resources>
