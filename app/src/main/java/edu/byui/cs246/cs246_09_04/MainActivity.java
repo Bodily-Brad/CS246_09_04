@@ -1,6 +1,9 @@
 package edu.byui.cs246.cs246_09_04;
 
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get our count from shared preferences
         count = readCountFromPreferences();
+        //count = readCountFromSQLite();
 
         // Update our Count textView
         updateCountDisplay();
@@ -77,10 +81,18 @@ public class MainActivity extends AppCompatActivity {
      * @param view View object calling this method
      */
     public void SaveCount(View view) {
+
         if ( writeCountToPreferences(count) ) {
             Snackbar.make(view, R.string.feedback_pref_save_successful, Snackbar.LENGTH_SHORT)
                     .setAction("Action", null).show();
         }
+
+        /*
+        if ( writeCountToSQLite(count) ) {
+            Snackbar.make(view, R.string.feedback_sql_save_successful, Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+        }
+        */
     }
 
     /**
@@ -99,13 +111,44 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Attempts to retrieve a saved count value from SharedPreferences
-     * @return the value saved in SharedPreferences, or a default value if no value is store in
+     * @return the value saved in SharedPreferences, or a default value if no value is stored in
      * SharedPreferences
      */
     private int readCountFromPreferences() {
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         int count = prefs.getInt(getString(R.string.pref_key_count), DEFAULT_COUNT);
         return count;
+    }
+
+    /**
+     * Attempts to retrieve a saved count value from a SQLite store
+     * @return the value saved in the SQLite store, or a default value if no value is found
+     */
+    private int readCountFromSQLite() {
+        // First, use an openhelper
+        // Hopefully, getBaseContext will do whatever we need...
+        CountOpenHelper openHelper = new CountOpenHelper(getBaseContext());
+
+        // Great, now get a readable DB
+        SQLiteDatabase db = openHelper.getReadableDatabase();
+
+        String sqlSelect = "SELECT value FROM countTable WHERE key='count'";
+        String[] columns = new String[1];
+        columns[0] = "value";
+        String[] none = new String[0];
+        Cursor cursor = db.query(true, "countTable", columns, "key='" + openHelper.getCountKey() + "'", none, null, null, null, null);
+        int returnCount = cursor.getCount();
+
+        // If nothing returned (presumably because this is before we've ever saved the count),
+        // return the default count
+
+        System.out.println("db count: " + Integer.toString(cursor.getCount()));
+
+        if (returnCount < 1) {
+            return DEFAULT_COUNT;
+        } else {
+            return cursor.getInt(0);
+        }
     }
 
     /**
@@ -119,6 +162,43 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt(getString(R.string.pref_key_count), count);
         editor.commit();
 
+        return true;
+    }
+
+    /**
+     * Attempts to store a count value in a SQLite store
+     * @param count the value to store in the SQLite store
+     * @return true if successful; otherwise, false.
+     */
+    private boolean writeCountToSQLite(int count) {
+
+        // First, use an openhelper
+        // Again, hopefully, getBaseContext will do whatever we need...
+        CountOpenHelper openHelper = new CountOpenHelper(getBaseContext());
+
+        // Great, now get a writeable DB
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+
+        // See if our row exists
+        String[] columns = new String[1];
+        columns[0] = openHelper.getValueColumnName();
+        String[] none = new String[0];
+        Cursor cursor = db.query(true, openHelper.getTableName(), columns, "key='" +  openHelper.getCountKey() +"'", none, null, null, null, null);
+        int returnCount = cursor.getCount();
+
+        // Update string
+        String sql = "UPDATE " + openHelper.getTableName() +
+                " SET " + openHelper.getValueColumnName() + "=" + Integer.toString(count) +
+                " WHERE " + openHelper.getKeyColumnName() + "='" + openHelper.getCountKey() + "';";
+
+        if (returnCount < 1) {
+            // Insert string
+            sql = "INSERT INTO " + openHelper.getTableName() +
+                " ( " + openHelper.getKeyColumnName() + ", " + openHelper.getValueColumnName() + ")" +
+                " VALUES ( " + openHelper.getCountKey() + ", " + Integer.toString(count) + ");";
+        }
+
+        db.execSQL(sql);
         return true;
     }
 
