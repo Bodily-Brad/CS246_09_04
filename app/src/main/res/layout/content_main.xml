@@ -19,11 +19,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/textCount"
         android:id="@+id/buttonAdvance"
-        android:text="@string/button_label_advance"/>
+        android:text="@string/button_label_advance"
+        android:clickable="true"
+        android:onClick="AdvanceCount"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/buttonAdvance"
         android:id="@+id/buttonSaveCount"
+        android:onClick="SaveCount"
         android:text="@string/button_label_save_count"/>
 </RelativeLayout>

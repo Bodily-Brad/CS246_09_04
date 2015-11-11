@@ -1,5 +1,6 @@
 package edu.byui.cs246.cs246_09_04;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -30,6 +31,12 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        // Get our count from shared preferences
+        count = readCountFromPreferences();
+
+        // Update our Count textView
+        updateCountDisplay();
     }
 
     @Override
@@ -54,12 +61,35 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private int readCountFromPreferences() {
-        return 0;
+    public void AdvanceCount(View view) {
+        incrementCount();
+        updateCountDisplay();
     }
 
-    private void writeCountToPreferences(int count) {
+    public void SaveCount(View view) {
+        if ( writeCountToPreferences(count) ) {
+            Snackbar.make(view, "Count Saved", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+    }
 
+    private void incrementCount() {
+        count++;
+    }
+
+    private int readCountFromPreferences() {
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        int count = prefs.getInt("count", 10);
+        return count;
+    }
+
+    private boolean writeCountToPreferences(int count) {
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("count", count);
+        editor.commit();
+
+        return true;
     }
 
     private void updateCountDisplay() {
