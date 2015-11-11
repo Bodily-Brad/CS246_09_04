@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Get our count from shared preferences
-        count = readCountFromPreferences();
-        //count = readCountFromSQLite();
+        //count = readCountFromPreferences();
+        count = readCountFromSQLite();
 
         // Update our Count textView
         updateCountDisplay();
@@ -137,22 +137,19 @@ public class MainActivity extends AppCompatActivity {
         // Great, now get a readable DB
         SQLiteDatabase db = openHelper.getReadableDatabase();
 
-        String sqlSelect = "SELECT value FROM countTable WHERE key='count'";
-        String[] columns = new String[1];
-        columns[0] = "value";
-        String[] none = new String[0];
-        Cursor cursor = db.query(true, "countTable", columns, "key='" + openHelper.getCountKey() + "'", none, null, null, null, null);
-        int returnCount = cursor.getCount();
+        String sql = "select * from " + openHelper.getTableName();
+        Cursor cursor = db.rawQuery(sql, null);
 
-        // If nothing returned (presumably because this is before we've ever saved the count),
-        // return the default count
+        // If a row exists, grab the count from it
+        if (cursor.getCount() > 0 ) {
+            cursor.moveToFirst();
+            int count = Integer.parseInt(cursor.getString(cursor.getColumnIndex("value")));
+            db.close();
+            return count;
 
-        System.out.println("db count: " + Integer.toString(cursor.getCount()));
-
-        if (returnCount < 1) {
-            return DEFAULT_COUNT;
         } else {
-            return cursor.getInt(0);
+            db.close();
+            return DEFAULT_COUNT;
         }
     }
 
@@ -210,6 +207,8 @@ public class MainActivity extends AppCompatActivity {
             db.execSQL(sql);
         }
 
+        db.close();
+
         return true;
     }
 
@@ -253,6 +252,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+
+        db.close();
 
     }
 }
